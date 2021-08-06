@@ -1,2 +1,5 @@
 # mississippi
-Lego Movie's 100 Mississippi countdown, as requested by 5 year old.
+
+An "implementation" of the Lego Movie's iconic 100 Mississippi countdown, as requested by my 5 year old.
+
+![mississippi.png](mississippi.png)
