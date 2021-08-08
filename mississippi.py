@@ -75,10 +75,11 @@ class smiley():
         self.image0.fill((0, 0, 0))
         self.image1.fill((255, 255, 0))
 
-        self.text = ''
+        self.text2show = ''
+        self.tmpfile = None
 
 
-    def say(self, char):
+    def mime_letter(self, char):
         """
           This function maps a character to a smiley face state and
         draws the result.
@@ -103,8 +104,8 @@ class smiley():
         self.__draw()
 
 
-    def set_text(self, text):
-        self.text = text
+    def __settext2show(self, text):
+        self.text2show = text
 
 
     def __draw(self):
@@ -135,13 +136,13 @@ class smiley():
             pygame.draw.line(background, (0, 0, 0), (xoff, yoff), (xoff + 8*self.size, yoff))
 
         font = pygame.font.Font('LcdSolid-VPzB.ttf', 110)
-        text = font.render(self.text, 1, (10, 10, 10))
+        text = font.render(self.text2show, 1, (10, 10, 10))
         textpos = text.get_rect()
         textpos.centerx = background.get_rect().centerx
         textpos.centery = background.get_rect().centery + 6*self.size
         background.blit(text, textpos)
-
         self.screen.blit(background, (0, 0))
+
         # handle quit requests
         for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -150,7 +151,40 @@ class smiley():
         pygame.display.flip()
 
 
+    def mime(self, text2show, text2mime):
+        self.__settext2show(text2show)
+        for c in '* %s' % text2mime:
+            self.mime_letter(c)
+            pygame.time.delay(int(1200/(len(text2mime) + 2)))
+        pygame.time.delay(400)
+
+
+    def voice(self, text2voice):
+        # stop previous voice and clean-up
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
+        if self.tmpfile is not None:
+            os.remove(self.tmpfile)
+
+        # call Google Text To Sound service to convert the text to sound
+        tts = gTTS(text = text2voice , lang='en')
+
+        # save to a temporary file
+        tmpf = NamedTemporaryFile(mode="w+b", suffix=".mp3", delete=False)
+        self.tmpfile = tmpf.name
+        tts.write_to_fp(tmpf)
+        tmpf.close()
+
+        # play voice (runs in background)
+        pygame.mixer.music.load(self.tmpfile)
+        pygame.mixer.music.play(start=0.25)
+        return
+
+
 def main():
+
+    keyword = 'mississippi'
+
     # initialize pygame
     pygame.mixer.init(16000)
     pygame.mixer.music.set_endevent(pygame.USEREVENT + 1)
@@ -160,39 +194,13 @@ def main():
 
     # initialize the smiley face
     mysmiley = smiley(screen)
-    mysmiley.say('_')
-
-    #
-    keyword = 'mississippi'
+    mysmiley.mime_letter('_')
 
     # countdown from 100
     for i in range(101):
-
-        # call Google Text To Sound service to convert the text to sound
         text = '%s %s' % ((100 - i), keyword)
-        tts = gTTS(text = text , lang='en')
-
-        # save to a temporary file
-        tmpf = NamedTemporaryFile(mode="w+b", suffix=".mp3", delete=False)
-        fname = tmpf.name
-        tts.write_to_fp(tmpf)
-        tmpf.close()
-
-        # play voice (runs in background)
-        pygame.mixer.music.load(fname)
-        pygame.mixer.music.play(start=0.25)
-
-        # animate smiley face
-        mysmiley.set_text(text)
-        for c in '* %s' % keyword:
-            mysmiley.say(c)
-            pygame.time.delay(int(1200/(len(keyword) + 2)))
-        pygame.time.delay(400)
-
-        # stop voice and remove the temporary file
-        pygame.mixer.music.stop()
-        pygame.mixer.music.unload()
-        os.remove(fname)
+        mysmiley.voice(text)
+        mysmiley.mime(text, '* %s' % keyword)
 
     pygame.quit()
 
