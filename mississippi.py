@@ -81,7 +81,7 @@ class smiley():
 
     def mime_letter(self, char):
         """
-          This function maps a character to a smiley face state and
+        This function maps a character to a smiley face state and
         draws the result.
 
         The mapping was defined by my son (5 years old at that time),
@@ -105,17 +105,29 @@ class smiley():
 
 
     def __settext2show(self, text):
+        """
+        This function sets the current text input to the class
+        """
         self.text2show = text
 
 
     def __draw(self):
+        """
+        This function draws the yellow smipley face according
+        to the current state.
+        """
+		# gets the current screen size
         screen_size = self.screen.get_size()
+		# fills the background green
         background = pygame.Surface(screen_size)
         background = background.convert()
         background.fill((0, 255, 0))
+		# gets the center position of the screen
         x0, y0 = background.get_rect().centerx - 4*self.size, 4*self.size
         xoff = x0
         yoff = y0
+
+		# paints the squares according to the state bitmap (1 = yellow, 0 = black)
         for i in range(9):
             for j in range(8):
                 if self.states[self.state][i][j] == 1:
@@ -126,6 +138,7 @@ class smiley():
             yoff += self.size
             xoff = x0
 
+		# creates the black grid lines around the squares
         for i in range(9):
             xoff = background.get_rect().centerx - 4*self.size + i*self.size
             yoff = 4*self.size
@@ -135,11 +148,14 @@ class smiley():
             yoff = 4*self.size + i*self.size
             pygame.draw.line(background, (0, 0, 0), (xoff, yoff), (xoff + 8*self.size, yoff))
 
-        font = pygame.font.Font('LcdSolid-VPzB.ttf', 110)
+		# render the text
+        font = pygame.font.Font(None, 192)
         text = font.render(self.text2show, 1, (10, 10, 10))
         textpos = text.get_rect()
         textpos.centerx = background.get_rect().centerx
         textpos.centery = background.get_rect().centery + 6*self.size
+
+		# blit everything to the screen
         background.blit(text, textpos)
         self.screen.blit(background, (0, 0))
 
@@ -152,6 +168,10 @@ class smiley():
 
 
     def mime(self, text2show, text2mime):
+        """
+        This function takes a text input and uses the mime_letter function
+        mime the word
+        """
         self.__settext2show(text2show)
         for c in '* %s' % text2mime:
             self.mime_letter(c)
@@ -160,6 +180,10 @@ class smiley():
 
 
     def voice(self, text2voice):
+        """
+        This function takes a text input, converts it to an mp3 using
+        Google's text2speach service, and plays it
+        """
         # stop previous voice and clean-up
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
