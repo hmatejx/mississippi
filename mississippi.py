@@ -85,7 +85,7 @@ class smiley():
         draws the result.
 
         The mapping was defined by my son (5 years old at that time),
-        so there is no questioning it's validity ;)
+        so there is no questioning its validity ;)
         """
         if len(char) == 0:
             self.state = 3
