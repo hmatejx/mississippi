@@ -116,18 +116,18 @@ class smiley():
         This function draws the yellow smipley face according
         to the current state.
         """
-		# gets the current screen size
+        # gets the current screen size
         screen_size = self.screen.get_size()
-		# fills the background green
+        # fills the background green
         background = pygame.Surface(screen_size)
         background = background.convert()
         background.fill((0, 255, 0))
-		# gets the center position of the screen
+        # gets the center position of the screen
         x0, y0 = background.get_rect().centerx - 4*self.size, 4*self.size
         xoff = x0
         yoff = y0
 
-		# paints the squares according to the state bitmap (1 = yellow, 0 = black)
+        # paints the squares according to the state bitmap (1 = yellow, 0 = black)
         for i in range(9):
             for j in range(8):
                 if self.states[self.state][i][j] == 1:
@@ -138,7 +138,7 @@ class smiley():
             yoff += self.size
             xoff = x0
 
-		# creates the black grid lines around the squares
+        # creates the black grid lines around the squares
         for i in range(9):
             xoff = background.get_rect().centerx - 4*self.size + i*self.size
             yoff = 4*self.size
@@ -148,14 +148,14 @@ class smiley():
             yoff = 4*self.size + i*self.size
             pygame.draw.line(background, (0, 0, 0), (xoff, yoff), (xoff + 8*self.size, yoff))
 
-		# render the text
+	# render the text
         font = pygame.font.Font(None, 192)
         text = font.render(self.text2show, 1, (10, 10, 10))
         textpos = text.get_rect()
         textpos.centerx = background.get_rect().centerx
         textpos.centery = background.get_rect().centery + 6*self.size
 
-		# blit everything to the screen
+        # blit everything to the screen
         background.blit(text, textpos)
         self.screen.blit(background, (0, 0))
 
